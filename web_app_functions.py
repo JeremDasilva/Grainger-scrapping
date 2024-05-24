@@ -180,3 +180,10 @@ def list_to_chain(liste):
     elements = [f"['{element}']" for element in liste]
     chain = ''.join(elements)
     return chain
+
+
+def get_options(requests_list, level, selected_options):
+    if level == 0:
+        return set(req[0] for req in requests_list)
+    else:
+        return set(req[level] for req in requests_list if req[:level] == selected_options)

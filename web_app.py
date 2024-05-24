@@ -8,13 +8,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from web_app_functions import *
 
+
 # Page formatting :
 st.title('Scrapping user page')
 st.sidebar.title('Menu')
 
 if st.sidebar.checkbox('Run scrapping'):
 
-    st.markdown('## Scrapping setting')
+    """st.markdown('## Scrapping setting')
 
     st.write(
         "afficher les main category qu'on veut scrap, les cocher et faire un bouton go")
@@ -54,7 +55,7 @@ if st.sidebar.checkbox('Run scrapping'):
         st.markdown(f'last urls scrapped : {results[1]}')
         st.markdown('Do you want to save?')
         if st.button("Yes!"):
-            json__saving(scraping)
+            json__saving(scraping)"""
 
 
 elif st.sidebar.checkbox('Benchmark visualisation'):
@@ -97,45 +98,26 @@ elif st.sidebar.checkbox('Benchmark visualisation'):
     requests_saved_cleaned = list(set(requests_saved))
     requests_saved_cleaned_list = [chain_to_list(
         request) for request in requests_saved_cleaned]
-    # ICI JE DOIS REGARDER LA LONGEUR DE TOUTE LES LISTES ET CREE OPTION I DE LA TAILLE DE LA PLUS ONGUE LISTE
+
+    max_lenght = 0
+    for request in requests_saved_cleaned_list:
+        if len(request) > max_lenght:
+            max_lenght = len(request)
 
     my_final_request = []
 
-    # Create a dropdown menu with selectbox method
-    first_layer = []
-    for req in requests_saved_cleaned_list:
-        first_layer.append(req[0])
-    first_layer = set(first_layer)
+    num_layers = max_lenght
 
-    option1 = st.selectbox(
-        'Choose an option',
-        (first_layer)
-    )
-
-    my_final_request.append(option1)
-
-    second_layer = []
-    for req in requests_saved_cleaned_list:
-        if req[0] == option1:
-            second_layer.append(req[1])
-    second_layer = set(second_layer)
-    option2 = st.selectbox(
-        'Choose an option',
-        (second_layer)
-    )
-    my_final_request.append(option2)
-
-    third_layer = []
-    for req in requests_saved_cleaned_list:
-        if req[0] == "Circular Light Bulbs & Lamps":
-            if req[1] == "Circular Lamps":
-                third_layer.append(req[2])
-    third_layer = set(third_layer)
-    option3 = st.selectbox(
-        'Choose an option',
-        (third_layer)
-    )
-    my_final_request.append(option3)
+    # Loop to create dropdown menus for every layers
+    for level in range(num_layers):
+        options = get_options(requests_saved_cleaned_list,
+                              level, my_final_request)
+        if options:
+            selected_option = st.selectbox(
+                f'Choose an option for layer {level + 1}', options)
+            my_final_request.append(selected_option)
+        else:
+            break
 
     my_final_request_chain = list_to_chain(my_final_request)
 
@@ -149,10 +131,8 @@ elif st.sidebar.checkbox('Benchmark visualisation'):
         if re.match(modele_regex, cle):
             cles_trouvees.append(cle)
 
-    print("Clés correspondantes au modèle regex :")
     dataframes_to_concat = []
     for cle_trouvee in cles_trouvees:
-        print(cle_trouvee)
         dataframes_to_concat.append(dataframes[cle_trouvee])
 
     df_concatene = pd.concat(dataframes_to_concat, ignore_index=True)
@@ -163,105 +143,35 @@ elif st.sidebar.checkbox('Benchmark visualisation'):
     df_concatene['Ref'] = df_concatene.groupby(
         [colonne for colonne in df_concatene.columns if colonne not in colonnes_a_exclure]).ngroup()
     df_concatene.sort_values(by=['Ref'], inplace=True)
+    
 
-    fig, axes = plt.subplots(
-        nrows=(max(df_concatene['Ref']) // 2) + 1, ncols=2, figsize=(15, 15))
+
+
+    num_plots = max(df_concatene['Ref']) + 1
+    nrows = (num_plots + 1) // 2
+    ncols = 2
+
+    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(15, 15))
+
     fig.suptitle(my_final_request_chain.replace("[", "").replace(
         "]", "").replace("''", " ").replace("'", ""), fontsize=16)
-    for i, ax in enumerate(axes.flat):
-        if i < max(df_concatene['Ref']):
-            df = df_concatene[df_concatene['Ref'] == i]
+
+    axes = axes.flatten()
+
+    for i, ax in enumerate(axes):
+        if i < num_plots:
+            df = df_concatene[df_concatene['Ref'] == i].sort_values(by=['Date','Price']) #Here we need to sort the sorting
             ax.plot(df['Date'], df['Price'], color='blue', linestyle='-')
             ax.scatter(x=df['Date'], y=df['Price'])
             ax.set_xlabel('Date')
             ax.set_ylabel('Price')
 
-            first_row_values = df_concatene.drop(
-                columns=['Date', 'Price']).iloc[0].values
+            first_row_values = df.iloc[0].drop(['Date', 'Price']).values
             string_first_row = ', '.join(map(str, first_row_values))
             ax.set_title(string_first_row, fontsize=11)
+        else:
+            ax.axis('off')
 
-    plt.tight_layout()
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
 
     st.pyplot(fig)
-
-    '''# Display the selected option
-    st.write('You selected:', option)
-                        
-    # Create lists to store data for each level
-    lists_by_depth = [[] for _ in range(max_max_deepness)]
-
-    for file in files_name:
-        full_path = os.path.join(path_to_json, file)
-        if os.path.isfile(full_path):
-            with open(full_path, 'r') as myfile:
-                datas = json.load(myfile)
-
-                for data in datas:
-                    max_depth = find_nested_depth(data)
-                    all_branches = find_branches(data, 1, max_depth)
-
-                    # Populate lists_by_depth with data from all_branches
-                    for i in range(len(all_branches)):
-                        branch = all_branches[i]
-                        branch_parts = branch.strip('[').strip(']').split('][')
-                        for j in range(len(branch_parts)):
-                            part = branch_parts[j].strip("'")
-                            lists_by_depth[j].append(part)
-
-    for reqst in requests_saved_cleaned:
-        print(reqst)
-
-    main = []
-    second = []
-    third = []
-
-    for req in requests_saved_cleaned[0].strip('[').strip(']').split('][') :
-        req_splitted = req.strip("'")
-        main.append(req_splitted[0])
-        second.append(req_splitted[1])
-        third.append(req_splitted[2])
-
-
-    requests_saved_cleaned = list(set(requests_saved))
-
-    for request in requests_saved_cleaned:
-        modele_regex = r"df_\d{4}-\d{2}-\d{2}_mon_fichier\.json_data" + re.escape(request)
-
-        cles_trouvees = []
-
-        # Parcours des clés du dictionnaire
-        for cle in dataframes.keys():
-            # Vérification si la clé correspond au modèle regex
-            if re.match(modele_regex, cle):
-                cles_trouvees.append(cle)
-
-        dataframes_to_concat = []
-
-        for cle_trouvee in cles_trouvees:
-            dataframes_to_concat.append(dataframes[cle_trouvee])
-
-        df_concatene = pd.concat(dataframes_to_concat, ignore_index=True)
-        
-        colonnes_a_exclure = ['Date', 'Price']
-
-        df_concatene['Ref'] = df_concatene.groupby([colonne for colonne in df_concatene.columns if colonne not in colonnes_a_exclure]).ngroup()
-        df_concatene.sort_values(by=['Ref'], inplace=True)
-        
-
-        fig, axes = plt.subplots(nrows=(max(df_concatene['Ref']) // 2) + 1, ncols=2, figsize=(15, 15))
-        fig.suptitle(request.replace("[", "").replace("]", "").replace("''", " ").replace("'", ""), fontsize=16)
-        for i, ax in enumerate(axes.flat):
-            if i < max(df_concatene['Ref']):
-                df = df_concatene[df_concatene['Ref'] == i]
-                ax.plot(df['Date'], df['Price'], color='blue', linestyle='-')  
-                ax.scatter(x=df['Date'], y=df['Price'])
-                ax.set_xlabel('Date')
-                ax.set_ylabel('Price')
-                
-                first_row_values = df_concatene.drop(columns=['Date', 'Price']).iloc[0].values
-                string_first_row = ', '.join(map(str, first_row_values))
-                ax.set_title(string_first_row, fontsize = 11)
-
-        plt.tight_layout()
-        plt.show()'''
