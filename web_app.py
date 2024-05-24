@@ -143,9 +143,6 @@ elif st.sidebar.checkbox('Benchmark visualisation'):
     df_concatene['Ref'] = df_concatene.groupby(
         [colonne for colonne in df_concatene.columns if colonne not in colonnes_a_exclure]).ngroup()
     df_concatene.sort_values(by=['Ref'], inplace=True)
-    
-
-
 
     num_plots = max(df_concatene['Ref']) + 1
     nrows = (num_plots + 1) // 2
@@ -160,7 +157,8 @@ elif st.sidebar.checkbox('Benchmark visualisation'):
 
     for i, ax in enumerate(axes):
         if i < num_plots:
-            df = df_concatene[df_concatene['Ref'] == i].sort_values(by=['Date','Price']) #Here we need to sort the sorting
+            df = df_concatene[df_concatene['Ref'] == i].sort_values(
+                by=['Date', 'Price'])  # Here we need to sort the sorting
             ax.plot(df['Date'], df['Price'], color='blue', linestyle='-')
             ax.scatter(x=df['Date'], y=df['Price'])
             ax.set_xlabel('Date')
