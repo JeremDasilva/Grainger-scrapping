@@ -1,4 +1,4 @@
-# Scrapy settings for urls_extractor project
+# Scrapy settings for scrapy_scraping project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -7,14 +7,14 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = "urls_extractor"
+BOT_NAME = "scrapy_scraping"
 
-SPIDER_MODULES = ["urls_extractor.spiders"]
-NEWSPIDER_MODULE = "urls_extractor.spiders"
+SPIDER_MODULES = ["scrapy_scraping.spiders"]
+NEWSPIDER_MODULE = "scrapy_scraping.spiders"
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = "urls_extractor (+http://www.yourdomain.com)"
+#USER_AGENT = "scrapy_scraping (+http://www.yourdomain.com)"
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
@@ -37,22 +37,21 @@ ROBOTSTXT_OBEY = True
 #TELNETCONSOLE_ENABLED = False
 
 # Override the default request headers:
-DEFAULT_REQUEST_HEADERS = {
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "Accept-Language": "en",
-    "User-Agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0"
-}
+#DEFAULT_REQUEST_HEADERS = {
+#    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+#    "Accept-Language": "en",
+#}
 
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
-#    "urls_extractor.middlewares.UrlsExtractorSpiderMiddleware": 543,
+#    "scrapy_scraping.middlewares.ScrapyScrapingSpiderMiddleware": 543,
 #}
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #DOWNLOADER_MIDDLEWARES = {
-#    "urls_extractor.middlewares.UrlsExtractorDownloaderMiddleware": 543,
+#    "scrapy_scraping.middlewares.ScrapyScrapingDownloaderMiddleware": 543,
 #}
 
 # Enable or disable extensions
@@ -64,7 +63,7 @@ DEFAULT_REQUEST_HEADERS = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 #ITEM_PIPELINES = {
-#    "urls_extractor.pipelines.UrlsExtractorPipeline": 300,
+#    "scrapy_scraping.pipelines.ScrapyScrapingPipeline": 300,
 #}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -92,5 +91,3 @@ DEFAULT_REQUEST_HEADERS = {
 REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
-FEED_FORMAT = 'json'
-FEED_URI = 'urls_2.json'

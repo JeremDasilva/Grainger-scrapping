@@ -3,7 +3,7 @@ import scrapy
 class MyspiderSpider(scrapy.Spider):
     name = "myspider"
     allowed_domains = ["www.grainger.com"]
-    start_urls = ["https://www.grainger.com/category/lighting/light-bulbs-lamps?categoryIndex=1"] #Starting point 'deep' in order to make the testing faster
+    start_urls = ["https://www.grainger.com/category"] #Starting point in order to make the testing faster
 
     def parse(self, response):
         links = response.css('a.BQOwdV')
